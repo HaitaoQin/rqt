@@ -25,14 +25,22 @@ if(BUILD_TESTING)
     set(${PROJECT_NAME}_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
   endif()
 
+  set(PROJECT_NAME "rqt_py_common_test_interfaces")
   rosidl_generate_interfaces(${PROJECT_NAME}
     test/msg/Val.msg
     test/msg/ArrayVal.msg
     test/srv/AddTwoInts.srv
-    DEPENDENCIES)
+    SKIP_INSTALL)
+  # setup fake ament index
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/ament_index/share/ament_index/resource_index/rosidl_interfaces/packages")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ament_index/share/ament_index/resource_index/rosidl_interfaces/packages/${PROJECT_NAME}")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/ament_index/share/ament_index/resource_index/rosidl_interfaces/rosidl_interfaces")
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ament_index/share/ament_index/resource_index/rosidl_interfaces/packages/${PROJECT_NAME}")
+  set(PROJECT_NAME "rqt_py_common")
 
   ament_add_pytest_test(${PROJECT_NAME} test
-    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}
+    APPEND_ENV AMENT_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/ament_index
+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_py
     TIMEOUT 90,
     PYTHON_EXECUTABLE "${${PROJECT_NAME}_PYTHON_EXECUTABLE}")
 endif()
